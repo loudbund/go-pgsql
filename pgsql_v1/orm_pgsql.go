@@ -431,17 +431,17 @@ func (Me ormPgsql) DescTable(tbName string) (map[string]UTbDesc, error) {
 	KeyTbDesc := map[string]UTbDesc{}
 
 	// 2、读取数据
-	sql := `SELECT` + ` c.column_name as field, c.data_type as type, COALESCE(i.Key,'') as key
-FROM information_schema.COLUMNS as c
-left join (
-	SELECT c.column_name as Field, 'PRI' as Key
-	FROM information_schema.table_constraints tc 
+	sql := `SELECT` + ` c.column_name AS field, c.data_type AS type, COALESCE(i.Key,'') AS key
+FROM information_schema.COLUMNS AS c
+LEFT JOIN (
+	SELECT c.column_name AS field, 'PRI' AS key , c.table_schema, c.table_name
+	FROM information_schema.table_constraints AS tc 
 	JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) 
 	JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema
 	  AND tc.table_name = c.table_name AND ccu.column_name = c.column_name
-	WHERE constraint_type = 'PRIMARY KEY' and tc.table_name = :name1
-) i on i.Field=c.column_name
-WHERE c.TABLE_NAME = :name2`
+	WHERE constraint_type = 'PRIMARY KEY'
+) i ON i.Field=c.column_name AND i.table_schema=c.table_schema AND i.table_name=c.table_name
+WHERE c.TABLE_NAME = :name2 AND c.table_schema='public'`
 	if res, err := Me.Query(sql, map[string]interface{}{"name1": tbName, "name2": tbName}); err != nil {
 		log.Error(err)
 		return nil, err
