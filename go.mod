@@ -1,4 +1,4 @@
-module github.com/loudbund/go-pqsql
+module github.com/loudbund/go-pgsql
 
 go 1.16
 

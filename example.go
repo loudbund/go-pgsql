@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	_ "github.com/lib/pq"
-	"github.com/loudbund/go-pqsql/pgsql_v1"
+	"github.com/loudbund/go-pgsql/pgsql_v1"
 	"log"
 	"os"
 	"time"

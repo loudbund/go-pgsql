@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/loudbund/go-pqsql/pgsql_v1"
+	"github.com/loudbund/go-pgsql/pgsql_v1"
 	"log"
 )
 
