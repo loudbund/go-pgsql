@@ -53,15 +53,18 @@ func (Me ormPgsql) Insert(table string, row map[string]interface{}, AutoIncrease
 
 	// -2- 写入后数据的自增Id：写入数据后数据库生成的
 	KeyId := int64(0)
-	if len(AutoIncreaseField) > 0 && AutoIncreaseField[0] != "" {
-		KeySql = KeySql + " returning " + AutoIncreaseField[0]
-	}
 
 	// -3- 执行写入操作
-	if err := Me.o.QueryRow(UtilFormatExec(KeySql), KeyValues...).Scan(&KeyId); err != nil {
+	if len(AutoIncreaseField) > 0 && AutoIncreaseField[0] != "" {
+		if err := Me.o.QueryRow(UtilFormatExec(KeySql+" returning "+AutoIncreaseField[0]), KeyValues...).Scan(&KeyId); err != nil {
+			log.Error(err)
+			return 0, err
+		}
+	} else if _, err := Me.o.Exec(UtilFormatExec(KeySql), KeyValues...); err != nil {
 		log.Error(err)
 		return 0, err
 	}
+
 	return KeyId, nil
 }
 
