@@ -42,17 +42,23 @@ type UFastQuery struct {
 
 // Insert 数据操作1： 写入数据
 // 示例: err := Insert("user" , map[string]interface{}{ "user_id":123,"user_name":"张三"} )
-func (Me ormPgsql) Insert(table string, row map[string]interface{}) (int64, error) {
+func (Me ormPgsql) Insert(table string, row map[string]interface{}, AutoIncreaseField ...string) (int64, error) {
 	if Me.initErr {
 		log.Error("数据库未连接成功", Me.dbCfgName, Me.dbName)
 		return 0, errors.New("数据库未连接成功:" + Me.dbCfgName + " . " + Me.dbName)
 	}
 
+	// -1- 拼凑sql和value
 	KeySql, KeyValues := Me.UtilInsert(table, row)
 
-	// 2、写入后数据的自增Id：写入数据后数据库生成的
+	// -2- 写入后数据的自增Id：写入数据后数据库生成的
 	KeyId := int64(0)
-	if err := Me.o.QueryRow(UtilFormatExec(KeySql+" returning id"), KeyValues...).Scan(&KeyId); err != nil {
+	if len(AutoIncreaseField) > 0 && AutoIncreaseField[0] != "" {
+		KeySql = KeySql + " returning " + AutoIncreaseField[0]
+	}
+
+	// -3- 执行写入操作
+	if err := Me.o.QueryRow(UtilFormatExec(KeySql), KeyValues...).Scan(&KeyId); err != nil {
 		log.Error(err)
 		return 0, err
 	}

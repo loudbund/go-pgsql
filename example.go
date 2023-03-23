@@ -76,7 +76,7 @@ func Insert() int64 {
 		"stars":   1.1,
 		"debug":   "test Insert",
 		"creator": "123",
-	})
+	}, "id")
 	fmt.Println(id, err)
 
 	return id
